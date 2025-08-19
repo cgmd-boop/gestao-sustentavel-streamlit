@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pydeck as pdk
+import folium
+from streamlit_folium import st_folium
 
 # Configuração da página
 st.set_page_config(page_title="Gestão de Energia da Fábrica", layout="wide")
@@ -86,33 +87,17 @@ elif menu == "Indicadores ESG, QSMS e ISO 50001":
     if status == "Estado Crítico":
         st.warning("⚠️ Sugestão: Realizar auditoria interna e revisar processos.")
 
-# Painel de monitoramento em tempo real com PyDeck
+# Painel de monitoramento em tempo real com Folium
 elif menu == "Painel de Monitoramento em Tempo Real":
     st.subheader("🛰️ Painel de Monitoramento")
 
     latitude = -8.1265
     longitude = -34.9392
 
-    map_data = pd.DataFrame({'lat': [latitude], 'lon': [longitude]})
+    m = folium.Map(location=[latitude, longitude], zoom_start=16)
+    folium.Marker([latitude, longitude], tooltip="BASF S/A - Suvinil").add_to(m)
 
-    st.pydeck_chart(pdk.Deck(
-        map_style='mapbox://styles/mapbox/light-v9',
-        initial_view_state=pdk.ViewState(
-            latitude=latitude,
-            longitude=longitude,
-            zoom=15,
-            pitch=50,
-        ),
-        layers=[
-            pdk.Layer(
-                'ScatterplotLayer',
-                data=map_data,
-                get_position='[lon, lat]',
-                get_color='[200, 30, 0, 160]',
-                get_radius=100,
-            ),
-        ],
-    ))
+    st_folium(m, width=700, height=500)
 
     parametro = st.selectbox("Selecione um parâmetro", ["Energia", "Água", "Manutenção", "Indicadores"])
     st.write(f"🔍 Pontos de interesse sobre o parâmetro **{parametro}**")
@@ -123,6 +108,9 @@ elif menu == "Relatório Estratégico":
     st.subheader("📄 Relatório Estratégico")
     st.write("Resumo dos dados registrados para análise estratégica.")
     st.download_button("📥 Baixar Relatório", data="Resumo dos dados registrados...", file_name="relatorio_estrategico.txt")
+
+
+
 
 
 
