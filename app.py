@@ -30,10 +30,15 @@ if menu == "Registro de Quedas de Energia":
     hora_queda = st.time_input("Horário da Queda")
     hora_retorno = st.time_input("Horário de Retorno")
     causa = st.selectbox("Causa", ["Interna", "Externa"])
+    protocolo = ""
+    responsavel = ""
     if causa == "Externa":
         protocolo = st.text_input("Protocolo da Concessionária")
+        responsavel = st.text_input("Responsável pelo Chamado")
     if st.button("Registrar"):
         st.success("✅ Queda de energia registrada com sucesso.")
+        if causa == "Externa":
+            st.info(f"Protocolo: {protocolo} | Responsável: {responsavel}")
 
 # Contas de água e energia
 elif menu == "Contas de Água e Energia":
@@ -76,8 +81,8 @@ elif menu == "Indicadores ESG, QSMS e ISO 50001":
 elif menu == "Painel de Monitoramento em Tempo Real":
     st.subheader("🛰️ Painel de Monitoramento")
     st.map(pd.DataFrame({
-        'lat': [-8.1125],
-        'lon': [-34.9156]
+        'lat': [-8.1265],
+        'lon': [-34.9392]
     }))
     parametro = st.selectbox("Selecione um parâmetro", ["Energia", "Água", "Manutenção", "Indicadores"])
     st.write(f"🔍 Pontos de interesse sobre o parâmetro **{parametro}**")
@@ -88,6 +93,7 @@ elif menu == "Relatório Estratégico":
     st.subheader("📄 Relatório Estratégico")
     st.write("Resumo dos dados registrados para análise estratégica.")
     st.download_button("📥 Baixar Relatório", data="Resumo dos dados registrados...", file_name="relatorio_estrategico.txt")
+
 
 
 
