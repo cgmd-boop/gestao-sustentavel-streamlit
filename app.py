@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import pydeck as pdk
 
 # Configuração da página
 st.set_page_config(page_title="Gestão de Energia da Fábrica", layout="wide")
@@ -30,15 +31,23 @@ if menu == "Registro de Quedas de Energia":
     hora_queda = st.time_input("Horário da Queda")
     hora_retorno = st.time_input("Horário de Retorno")
     causa = st.selectbox("Causa", ["Interna", "Externa"])
+
     protocolo = ""
     responsavel = ""
+    motivo_interno = ""
+
     if causa == "Externa":
         protocolo = st.text_input("Protocolo da Concessionária")
         responsavel = st.text_input("Responsável pelo Chamado")
+    elif causa == "Interna":
+        motivo_interno = st.text_input("Motivo da Queda Interna")
+
     if st.button("Registrar"):
         st.success("✅ Queda de energia registrada com sucesso.")
         if causa == "Externa":
             st.info(f"Protocolo: {protocolo} | Responsável: {responsavel}")
+        elif causa == "Interna":
+            st.info(f"Motivo: {motivo_interno}")
 
 # Contas de água e energia
 elif menu == "Contas de Água e Energia":
@@ -77,13 +86,34 @@ elif menu == "Indicadores ESG, QSMS e ISO 50001":
     if status == "Estado Crítico":
         st.warning("⚠️ Sugestão: Realizar auditoria interna e revisar processos.")
 
-# Painel de monitoramento em tempo real
+# Painel de monitoramento em tempo real com PyDeck
 elif menu == "Painel de Monitoramento em Tempo Real":
     st.subheader("🛰️ Painel de Monitoramento")
-    st.map(pd.DataFrame({
-        'lat': [-8.1265],
-        'lon': [-34.9392]
-    }))
+
+    latitude = -8.1265
+    longitude = -34.9392
+
+    map_data = pd.DataFrame({'lat': [latitude], 'lon': [longitude]})
+
+    st.pydeck_chart(pdk.Deck(
+        map_style='mapbox://styles/mapbox/light-v9',
+        initial_view_state=pdk.ViewState(
+            latitude=latitude,
+            longitude=longitude,
+            zoom=15,
+            pitch=50,
+        ),
+        layers=[
+            pdk.Layer(
+                'ScatterplotLayer',
+                data=map_data,
+                get_position='[lon, lat]',
+                get_color='[200, 30, 0, 160]',
+                get_radius=100,
+            ),
+        ],
+    ))
+
     parametro = st.selectbox("Selecione um parâmetro", ["Energia", "Água", "Manutenção", "Indicadores"])
     st.write(f"🔍 Pontos de interesse sobre o parâmetro **{parametro}**")
     st.write("📡 Visualização em tempo real dos dados e status.")
@@ -93,6 +123,9 @@ elif menu == "Relatório Estratégico":
     st.subheader("📄 Relatório Estratégico")
     st.write("Resumo dos dados registrados para análise estratégica.")
     st.download_button("📥 Baixar Relatório", data="Resumo dos dados registrados...", file_name="relatorio_estrategico.txt")
+
+
+
 
 
 
